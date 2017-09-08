@@ -27,17 +27,30 @@ class cli {
 	}
 
 	execute() {
+
 		let file = this.commandFiles[this.in.command];
+
 		if (!file) {
 			console.log('Can\'t find command file');
 			return;
 		}
 
 		let commandInstance = new (require(file))();
+
 		if (typeof commandInstance.handle !== 'function') {
 			console.log('Can\'t find handle method');
 			return;
 		}
+
+		commandInstance.input = {};
+		commandInstance.input.options = this.in.options;
+		commandInstance.input.option = function(option) {
+			if (commandInstance.input.options.indexOf(option) == -1) {
+				return false;
+			}
+			return true;
+		};
+
 
 		commandInstance.handle();
 
@@ -55,6 +68,7 @@ class cli {
 	registerDefaultCommands() {
 		this.commandFiles = {
 			'register': __basePath + '/Commands/RegisterCommand.js',  
+			'test': __basePath + '/Commands/TestCommand.js'
 		}
 	}
 

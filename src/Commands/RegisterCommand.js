@@ -7,6 +7,7 @@ class RegisterCommand {
 		this.command = "register";
 		this.description = "Registers commands to `c` cache";
 		this.options = {
+			
 		};
 	}
 
