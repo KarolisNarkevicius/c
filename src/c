@@ -1,0 +1,5 @@
+#!/usr/local/bin/node
+
+global.__basePath = __dirname;
+const cli = require('./cli');
+ 
