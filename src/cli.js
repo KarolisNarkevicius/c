@@ -1,77 +1,248 @@
 const Cache = require('./Cache');
 
+const pvz = `make:controller UserController -r -m="User" --route="users" -k karolis -t karolis -p='kaz kakitas' -l='niekos' -k kazkas`;
+
+//matches any option
+const OPTION_ANY = /(\s(--?(.|\w+)(=|\s)(\w+|('[A-Za-z0-9_ ]+')|("[A-Za-z0-9_ ]+"))))|(\s--?(\w+|.)(\s|$))/g;
+
+//-r --resource
+const OPTION_NO_VALUE = /(\s--?(\w+|.)(\s|$))/;
+
+//-r value | --resource value | -r=value | --resource=value
+const OPTION_WITH_VALUE_BASIC = /(\s--?(\w+|.)(=|\s)\w+)/;
+
+//-r="value" | --resource="value" | -r "value" | --resource "value"
+const OPTION_WITH_VALUE_QUOTE_DOUBLE = /(\s--?(\w+|.)(=|\s)("[A-Za-z0-9_ ]+"))/;
+//same but with single quotes
+const OPTION_WITH_VALUE_QUOTE_SINGLE = /(\s--?(\w+|.)(=|\s)('[A-Za-z0-9_ ]+'))/;
+
 class cli {
 
-	constructor() {
-		this.in = {};
+    constructor() {
 
-		let input = process.argv;
-		input.shift();
-		input.shift();
+        this.in = {};
+        this.commandInstance = null;
 
-		this.in.command = false;
-		if (input.length > 0) {
-			this.in.command = input.shift();
-		}
+        let input = process.argv;
+        input.shift();
+        input.shift();
 
-		this.in.options = [];
-		if (input.length > 0) {
-			this.in.options = input;
-		}
+        this.in.command = false;
+        if (input.length > 0) {
+            this.in.command = input.shift();
+        }
 
-		this.registerDefaultCommands();
-		this.registerFromCache();
+        this.in.options;
+        if (input.length > 0) {
+            this.in.options = input;
+        }
 
-		this.execute();
+        this.registerDefaultCommands();
+        this.registerFromCache();
 
-	}
+        this.execute();
 
-	execute() {
+    }
 
-		let file = this.commandFiles[this.in.command];
+    execute() {
 
-		if (!file) {
-			console.log('Can\'t find command file');
-			return;
-		}
+        let file = this.commandFiles[this.in.command];
 
-		let commandInstance = new (require(file))();
+        if (!file) {
+            console.log('Can\'t find command file'); //cl
+            return;
+        }
 
-		if (typeof commandInstance.handle !== 'function') {
-			console.log('Can\'t find handle method');
-			return;
-		}
+        this.commandInstance = new (require(file))();
 
-		commandInstance.input = {};
-		commandInstance.input.options = this.in.options;
-		commandInstance.input.option = function(option) {
-			if (commandInstance.input.options.indexOf(option) == -1) {
-				return false;
-			}
-			return true;
-		};
+        if (typeof this.commandInstance.handle !== 'function') {
+            console.log('Can\'t find handle method'); //cl
+            return;
+        }
 
+        this.commandInstance.input = {};
 
-		commandInstance.handle();
+        this.parseInput();
+
+        this.commandInstance.handle();
 
 
-	}	
+    }
 
-	registerFromCache() {
+    parseInput() {
+        let optionsArray;
+        let inputArguments = [];
+        let optionsString = '';
+        if (this.in.options) {
+            //put all options to string
 
-		let files = Cache.get('commands');
-		this.commandFiles = Object.assign(this.commandFiles ,files);
+            for(let i = 0; i < this.in.options.length; i++) {
+                let opt = this.in.options[i];
+                if (opt.match(/=/)) {
+                    let split = opt.split('=');
+                    if (split[1].match(/\s/)) {
+                        split[1] = '"' + split[1] + '"';
+                    }
+                    this.in.options[i] = split.join('=');
+                } else if (opt.match(/\s/)) {
+                    this.in.options[i] = '"' + opt + '"';
+                }
+            }
 
-	}
+            optionsString = this.in.options.join(' ');
+
+            //extract only options to array
+            optionsArray = optionsString.match(OPTION_ANY);
+
+            //set argument string
+            inputArguments = optionsString.replace(OPTION_ANY, '').split(' ');
+
+            //create option only string
+            if (optionsArray) {
+                optionsString = optionsArray.join(' ');
+            }
+        }
+
+        this.parseArguments(inputArguments);
+
+        this.parseOptions(optionsString);
+
+    }
+
+    parseOptions(optionsString) {
+
+        if (!this.commandInstance.options) {
+            return;
+        }
+
+        for (let i = 0; i < this.commandInstance.options.length; i++) {
+            let commandOption = this.commandInstance.options[i];
+
+            //generates the key with short version
+            //--version | -v
+            let key = '(' + commandOption.key;
+            if (commandOption.short) {
+                key += '|' + commandOption.short + ')';
+            } else {
+                key += ')';
+            }
+
+            //extract an option from options string OPTION_ANY CONSTANT
+            let expression = '(\\s(' + key + '(=|\\s)(\\w+|(\'[A-Za-z0-9_ ]+\')|("[A-Za-z0-9_ ]+"))))|(\\s' + key + '(\\s|$))';
+            let re = new RegExp(expression);
+            let matches = optionsString.match(re);
+            if (matches) {
+                this.setOptionByType(commandOption, matches[0]);
+            }
+
+        }
+
+    }
 
 
-	registerDefaultCommands() {
-		this.commandFiles = {
-			'register': __basePath + '/Commands/RegisterCommand.js',  
-			'test': __basePath + '/Commands/TestCommand.js'
-		}
-	}
+    setOptionByType(commandOption, match) {
 
+        let newKey = commandOption.key.replace(/--/, '');
+        let value;
+
+        //check if value exists
+        if (match.match(/(--?(\w+|.)$)/)) {
+            this.commandInstance.input[newKey] = true;
+            return;
+        }
+
+        if (match.match(/=/)) {
+            value = match.split('=')[1].replace(/"/g, '');
+            this.commandInstance.input[newKey] = value;
+            return;
+        }
+
+        let key = commandOption.key;
+        if (commandOption.short) {
+            key += '|' + commandOption.short;
+        }
+
+        let matches = match.match(new RegExp(key+'\\s"(.+)"'));
+        if (matches[1]) {
+            this.commandInstance.input[newKey] = matches[1];
+            return;
+        }
+
+        //remove unwanted stuff from match to extract the value if it exists
+    }
+
+    parseArguments(inputArguments) {
+        if (!this.commandInstance.arguments) {
+            return;
+        }
+
+        //set command instance input arguments
+        for (let i = 0; i < inputArguments.length; i++) {
+            //if there is no argument set in command object, just skip
+            if (!this.commandInstance.arguments[i]) {
+                continue;
+            }
+
+            let inputArgument = inputArguments[i];
+            let commandArgument = this.commandInstance.arguments[i];
+
+            this.checkCommandArgumentKey(this.commandInstance.arguments[i]);
+
+            if (typeof commandArgument === 'string') {
+                commandArgument = {
+                    key: commandArgument
+                };
+            }
+
+            this.commandInstance.input[commandArgument.key] = inputArgument;
+
+        }
+
+        //check if all required arguments are set
+        for (let i = 0; i < this.commandInstance.arguments.length; i++) {
+            let required = this.commandInstance.arguments[i].required;
+            let key = this.commandInstance.arguments[i].key;
+            let default_value = this.commandInstance.arguments[i].default;
+
+            this.checkCommandArgumentKey(this.commandInstance.arguments[i]);
+
+            //if default is set and input is not then set it to default
+            if (default_value && !this.commandInstance.input[key]) {
+                this.commandInstance.input[key] = default_value;
+            }
+
+            //if arg is required and input is not set exit
+            if (required && !this.commandInstance.input[key]) {
+                console.log('Argument `' + key + '` not found.'); //cl
+                process.exit(0);
+            }
+        }
+
+    }
+
+    checkCommandArgumentKey(commandArgument) {
+        //if command argument is string turn it into an object
+
+        if (!commandArgument.key && typeof commandArgument !== 'string') {
+            console.log('Command argument is missing a key.'); //cl
+            process.exit(0);
+        }
+    }
+
+    registerFromCache() {
+
+        let files = Cache.get('commands');
+        this.commandFiles = Object.assign(this.commandFiles, files);
+
+    }
+
+
+    registerDefaultCommands() {
+        this.commandFiles = {
+            'register': __basePath + '/Commands/RegisterCommand.js',
+            'test': __basePath + '/Commands/TestCommand.js'
+        }
+    }
 
 }
 

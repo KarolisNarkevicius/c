@@ -4,14 +4,39 @@ class TestCommand {
 
 		this.command = 'test';
 		this.description = 'test command for testing creating `c` functionality';
-		this.options = ['{user_id}', '-c', '--command=kazkas'];
+
+		this.arguments = [
+			{
+				key: 'name',
+				required:true,
+				default: 'Joe', //if deafault is set required is ignored
+				description: 'User name',
+			},
+			'kitas',
+		];
+
+		this.options = [
+			{
+				key: '--last',
+				short: '-l',
+				default: '1.0.0',
+				required:false,
+				description: 'Prints last name',
+			}, 
+			{
+				key: '--model',
+                short: '-m',
+                default: 'Users',
+                required:true,
+                description: 'Sets user model'
+			}
+		];
 
 	}
 
 	handle() {
 
-		console.log(this.input.option('{kazkas}'));
-		console.log('Test command');
+	    console.log(this.input.model);
 
 	}
 
