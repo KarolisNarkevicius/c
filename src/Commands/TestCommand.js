@@ -8,7 +8,6 @@ class TestCommand {
 		this.arguments = [
 			{
 				key: 'name',
-				required:true,
 				default: 'Joe', //if deafault is set required is ignored
 				description: 'User name',
 			},
@@ -36,7 +35,7 @@ class TestCommand {
 
 	handle() {
 
-	    console.log(this.input.model);
+	    console.log(this.input);
 
 	}
 

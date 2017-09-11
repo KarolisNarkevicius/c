@@ -3,7 +3,7 @@ const Cache = require('./Cache');
 const pvz = `make:controller UserController -r -m="User" --route="users" -k karolis -t karolis -p='kaz kakitas' -l='niekos' -k kazkas`;
 
 //matches any option
-const OPTION_ANY = /(\s(--?(.|\w+)(=|\s)(\w+|('[A-Za-z0-9_ ]+')|("[A-Za-z0-9_ ]+"))))|(\s--?(\w+|.)(\s|$))/g;
+const OPTION_ANY = /((\s|^)(--?(.|\w+)(=|\s)(\w+|('[A-Za-z0-9_ ]+')|("[A-Za-z0-9_ ]+"))))|(\s--?(\w+|.)(\s|$))/g;
 
 //-r --resource
 const OPTION_NO_VALUE = /(\s--?(\w+|.)(\s|$))/;
@@ -163,7 +163,7 @@ class cli {
         }
 
         let matches = match.match(new RegExp(key+'\\s"(.+)"'));
-        if (matches[1]) {
+        if (matches && matches[1]) {
             this.commandInstance.input[newKey] = matches[1];
             return;
         }
@@ -239,8 +239,9 @@ class cli {
 
     registerDefaultCommands() {
         this.commandFiles = {
-            'register': __basePath + '/Commands/RegisterCommand.js',
-            'test': __basePath + '/Commands/TestCommand.js'
+            'cache:dir': __basePath + '/Commands/CacheDirCommand.js',
+            'test': __basePath + '/Commands/TestCommand.js',
+            'make:command': __basePath + '/Commands/MakeCommand/MakeCommand.js',
         }
     }
 

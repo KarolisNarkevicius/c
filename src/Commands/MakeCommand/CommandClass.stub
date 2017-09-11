@@ -1,0 +1,17 @@
+class _NAME_Command {
+
+    constructor() {
+
+        this.command = "_COMMAND_";
+
+    }
+
+    handle() {
+
+        //
+
+    }
+
+}
+
+module.exports = _NAME_Command;

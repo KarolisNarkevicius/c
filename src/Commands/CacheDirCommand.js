@@ -4,8 +4,8 @@ const fs = require('fs');
 class RegisterCommand {
 
 	constructor() {
-		this.command = "register";
-		this.description = "Registers commands to `c` cache";
+		this.command = "cache:dir";
+		this.description = "Registers current directory commands to `c` cache";
 	}
 
 	handle() {
@@ -18,7 +18,7 @@ class RegisterCommand {
 
 		files.forEach(function(file) {
 
-			let filepath = path + '/' + file; 
+			let filepath = path + '/' + file;
 			let instance =  new (require(filepath))();
 			if (instance.command && typeof instance.handle === 'function') {
 
