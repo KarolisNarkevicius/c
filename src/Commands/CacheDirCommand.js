@@ -1,5 +1,6 @@
 const Cache = require('./../Cache');
 const fs = require('fs');
+const _ = require('lodash');
 
 class RegisterCommand {
 
@@ -16,15 +17,17 @@ class RegisterCommand {
 			fs.readdirSync(path)
 		);
 
+		let commands = Cache.get('commands');
+
 		files.forEach(function(file) {
 
 			let filepath = path + '/' + file;
 			let instance =  new (require(filepath))();
 			if (instance.command && typeof instance.handle === 'function') {
 
-				if (!Cache.get('commands.'+instance.command)) {
+				if (!commands || commands.indexOf(filepath) == -1) {
 
-					Cache.set('commands.'+instance.command, filepath);
+					Cache.push('commands', filepath);
 					console.log('Added ' + instance.command + ' command.');
 
 				} else {

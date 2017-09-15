@@ -33,7 +33,7 @@ class MakeCommand {
 
         let command = name.toLocaleLowerCase();
 
-        let template = fs.readFileSync(path.resolve('src/Commands/MakeCommand/CommandClass.stub'), 'UTF-8');
+        let template = fs.readFileSync( __basePath + '/Commands/MakeCommand/CommandClass.stub', 'UTF-8');
 
         let search = {
             '_NAME_': name,

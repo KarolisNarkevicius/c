@@ -1,4 +1,6 @@
 const Cache = require('./Cache');
+const _ = require('lodash');
+const fs = require('fs');
 
 const pvz = `make:controller UserController -r -m="User" --route="users" -k karolis -t karolis -p='kaz kakitas' -l='niekos' -k kazkas`;
 
@@ -46,14 +48,37 @@ class cli {
 
     execute() {
 
-        let file = this.commandFiles[this.in.command];
+        if (!this.in.command) {
+            this.in.command = 'list';
+        }
 
-        if (!file) {
+        let file;
+
+        _.each(this.commandFiles, function(path) {
+
+            if (!fs.existsSync(path)) {
+                return;
+            }
+
+            let instance = new (require(path))();
+
+            if (this.in.command == instance.command) {
+                this.commandInstance = instance;
+                return false;
+            }
+
+
+        }.bind(this));
+
+        if (!this.commandInstance) {
             console.log('Can\'t find command file'); //cl
             return;
         }
 
-        this.commandInstance = new (require(file))();
+
+        if (this.in.command == 'list') {
+            this.commandInstance.commandFiles = this.commandFiles;
+        }
 
         if (typeof this.commandInstance.handle !== 'function') {
             console.log('Can\'t find handle method'); //cl
@@ -238,11 +263,13 @@ class cli {
 
 
     registerDefaultCommands() {
-        this.commandFiles = {
-            'cache:dir': __basePath + '/Commands/CacheDirCommand.js',
-            'test': __basePath + '/Commands/TestCommand.js',
-            'make:command': __basePath + '/Commands/MakeCommand/MakeCommand.js',
-        }
+        this.commandFiles = [
+            __basePath + '/Commands/ListCommand.js',
+            __basePath + '/Commands/CacheDirCommand.js',
+            __basePath + '/Commands/TestCommand.js',
+            __basePath + '/Commands/MakeCommand/MakeCommand.js',
+            __basePath + '/Commands/CacheClearCommand.js',
+        ];
     }
 
 }

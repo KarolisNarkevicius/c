@@ -1,4 +1,5 @@
 const fs = require('fs');
+const _ = require('lodash');
 
 class Cache {
 	
@@ -62,14 +63,69 @@ class Cache {
 			return null;
 
 		} else {
+
 			if (ref[key]) {
 				return ref[key];
 			}
 			return null;
+		
+		}
+
+	}
+
+	remove(key, ref=false) {
+		if (!ref) {
+			ref = this.cache;
+		}
+		let split = key.split('.');
+		if (split.length > 1) {
+
+			let k = split.shift();
+			key = split.join('.');
+			if (ref[k]) {
+				this.remove(key, ref[k]);
+			}
+			return null;
+
+		} else {
+			if (ref[key]) {
+				if (Array.isArray(ref)) {
+					ref.splice(key, 1);
+				} else {
+					delete ref[key];
+				}
+				this.writeCacheArrayToFile();
+				this.reloadCacheArray();
+			}
+		}
+	}
+
+	push(key, value, ref=false) {
+		if (!ref) {
+			ref = this.cache;
+		}
+
+		let split = key.split('.');
+
+		if (split.length > 1) {
+
+			let k = split.shift();
+			let newRef;
+			if (!ref[k]) {
+				ref[k] = {};
+			}
+			this.set(split.join('.'), value, ref[k]);
+			return;
+
+		} else {
+			if (!ref[key]) {
+				ref[key] = [];
+			}
+			ref[key].push(value);
 
 		}
 
-
+		this.writeCacheArrayToFile();
 	}
 
 	reloadCacheArray() {
