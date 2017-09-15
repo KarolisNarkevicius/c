@@ -22,7 +22,7 @@ This will create a new file `FooCommand` in current directory.
 	    }
 	    
 	    handle() {
-		    console.log('Hello world!');
+		console.log('Hello world!');
 	    }
 	}
 	module.exports = FooCommand;
