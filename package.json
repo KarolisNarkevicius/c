@@ -1,7 +1,8 @@
 {
   "name": "c-global",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Command line tool",
+  "repository": "KarolisNarkevicius/c",
   "main": "index.js",
   "bin": {
     "c": "./index.js"
