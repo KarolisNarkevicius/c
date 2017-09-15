@@ -1,10 +1,13 @@
 #C-GLOBAL
+
 A global framework for creating cli commands
 
 #Install
+
     npm install -g c-global
     
 #Commands
+
    Just type in `c` in the console and it will list all available commands
 
 #Creating a command
