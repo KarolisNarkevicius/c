@@ -1,16 +1,16 @@
-#C-GLOBAL
+##C-GLOBAL
 
 A global framework for creating cli commands
 
-#Install
+##Install
 
     npm install -g c-global
     
-#Commands
+##Commands
 
    Just type in `c` in the console and it will list all available commands
 
-#Creating a command
+##Creating a command
     c make:command foo
 
 This will create a new file `FooCommand` in current directory.
