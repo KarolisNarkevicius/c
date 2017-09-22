@@ -54,19 +54,18 @@ class cli {
 
         let file;
 
-        _.each(this.commandFiles, function(path) {
+        _.each(this.commandFiles, function (path) {
 
-            if (!fs.existsSync(path)) {
-                return;
+            if (fs.existsSync(path)) {
+
+                let instance = new (require(path))();
+
+                if (this.in.command == instance.command) {
+                    this.commandInstance = instance;
+                    return false;
+                }
+
             }
-
-            let instance = new (require(path))();
-
-            if (this.in.command == instance.command) {
-                this.commandInstance = instance;
-                return false;
-            }
-
 
         }.bind(this));
 
@@ -101,7 +100,7 @@ class cli {
         if (this.in.options) {
             //put all options to string
 
-            for(let i = 0; i < this.in.options.length; i++) {
+            for (let i = 0; i < this.in.options.length; i++) {
                 let opt = this.in.options[i];
                 if (opt.match(/=/)) {
                     let split = opt.split('=');
@@ -187,18 +186,17 @@ class cli {
             key += '|' + commandOption.short;
         }
 
-        let matches = match.match(new RegExp(key+'\\s"(.+)"'));
+        let matches = match.match(new RegExp(key + '\\s"(.+)"'));
         if (matches && matches[1]) {
             this.commandInstance.input[newKey] = matches[1];
             return;
         }
 
-        matches = match.match(new RegExp(key+'\\s(.+)'));
+        matches = match.match(new RegExp(key + '\\s(.+)'));
         if (matches && matches[1]) {
             this.commandInstance.input[newKey] = matches[1];
             return;
         }
-
 
 
     }
@@ -264,7 +262,7 @@ class cli {
     registerFromCache() {
 
         let files = Cache.get('commands');
-        this.commandFiles = Object.assign(this.commandFiles, files);
+        this.commandFiles = _.concat(this.commandFiles, files);
 
     }
 
