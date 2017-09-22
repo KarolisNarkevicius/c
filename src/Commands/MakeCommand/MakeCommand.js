@@ -16,11 +16,7 @@ class MakeCommand {
         ];
 
         this.options = [
-            {
-                key: '--cache',
-                short: '-c',
-                description: 'Automaticly cache the command',
-            }
+
         ];
     }
 
@@ -34,6 +30,10 @@ class MakeCommand {
         let command = name.toLocaleLowerCase();
 
         let template = fs.readFileSync( __basePath + '/Commands/MakeCommand/CommandClass.stub', 'UTF-8');
+
+        if (command === 'foo') {
+            let template = fs.readFileSync( __basePath + '/Commands/MakeCommand/foo.stub', 'UTF-8');
+        }
 
         let search = {
             '_NAME_': name,
@@ -53,7 +53,9 @@ class MakeCommand {
 
         fs.writeFileSync(filepath, template);
 
-        //check for --cache and cache if true
+        let cacheDirCommand = new (require('./../CacheDirCommand'))();
+        cacheDirCommand.handle();
+
 
     }
 

@@ -157,7 +157,7 @@ class cli {
             let re = new RegExp(expression);
             let matches = optionsString.match(re);
             if (matches) {
-                this.setOptionByType(commandOption, matches[0]);
+                this.setOptionByType(commandOption, matches[0].trim());
             }
 
         }
@@ -193,7 +193,14 @@ class cli {
             return;
         }
 
-        //remove unwanted stuff from match to extract the value if it exists
+        matches = match.match(new RegExp(key+'\\s(.+)'));
+        if (matches && matches[1]) {
+            this.commandInstance.input[newKey] = matches[1];
+            return;
+        }
+
+
+
     }
 
     parseArguments(inputArguments) {

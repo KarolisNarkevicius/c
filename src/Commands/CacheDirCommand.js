@@ -2,7 +2,7 @@ const Cache = require('./../Cache');
 const fs = require('fs');
 const _ = require('lodash');
 
-class RegisterCommand {
+class CacheDirCommand {
 
 	constructor() {
 		this.command = "cache:dir";
@@ -28,10 +28,10 @@ class RegisterCommand {
 				if (!commands || commands.indexOf(filepath) == -1) {
 
 					Cache.push('commands', filepath);
-					console.log('Added ' + instance.command + ' command.');
+					console.log('Cache: Added ' + instance.command + ' command.');
 
 				} else {
-					console.log(instance.command + ' already in cache.');
+					console.log('Cache: ' + instance.command + ' already in cache.');
 				}
 
 			} else {
@@ -59,4 +59,4 @@ class RegisterCommand {
 
 }
 
-module.exports = RegisterCommand;
+module.exports = CacheDirCommand;

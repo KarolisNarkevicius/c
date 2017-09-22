@@ -1,0 +1,11 @@
+class FooCommand {
+    constructor() {
+        this.command = "foo";
+        this.description = "My awesome description!";
+    }
+
+    handle() {
+		console.log('Hello world!');
+    }
+}
+module.exports = FooCommand;
