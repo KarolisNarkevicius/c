@@ -4,14 +4,14 @@ A global framework for creating cli commands
 
 ## Install
 
-    npm install -g c-global
+    $ npm install -g c-global
     
 ## Commands
 
    Just type in `c` in the console and it will list all available commands
 
 ## Creating a command
-    c make:command foo
+    $ c make:command foo
 
 This will create a new file `FooCommand` in current directory.
 
@@ -72,12 +72,12 @@ To execute the command just type `c foo` in the console.
 
 The above command accepts one `lastname` option. There are multiple ways of passing it:
     
-     c make:user John --lastname Doe 
-     c make:user John --lastname=Doe 
-     c make:user John --lastname="Doe Doee" 
-     c make:user John -l Doe 
-     c make:user John -l=Doe 
-     c make:user John -l="Doe Doee" 
+     $ c make:user John --lastname Doe 
+     $ c make:user John --lastname=Doe 
+     $ c make:user John --lastname="Doe Doee" 
+     $ c make:user John -l Doe 
+     $ c make:user John -l=Doe 
+     $ c make:user John -l="Doe Doee" 
     
 It does not matter witch option you use, all of them will store the value into this.input.lastname variable
 
@@ -93,4 +93,5 @@ To cache the commands your self you can use `c cache:dir` comamand, it will cach
 the current directory. To remove commands that no longer exist use `c cache:clear` command.
 
 
-
+##Tests
+    npm test
