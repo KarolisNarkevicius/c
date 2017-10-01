@@ -3,81 +3,85 @@
 A global framework for creating cli commands
 
 ## Install
-
-    $ npm install -g c-global
-    
+```bash
+$ npm install -g c-global
+```   
 ## Commands
 
    Just type in `c` in the console and it will list all available commands
 
 ## Creating a command
-    $ c make:command foo
-
+```bash
+$ c make:command foo
+```
 This will create a new file `FooCommand` in current directory.
-
-    class FooCommand {
-	    constructor() {
-	        this.command = "foo";
-	        this.description = "My awesome description!";
-	    }
-	    
-	    handle() {
-		console.log('Hello world!');
-	    }
-	}
-	module.exports = FooCommand;
-
+```bash
+class FooCommand {
+    constructor() {
+        this.command = "foo";
+        this.description = "My awesome description!";
+    }
+    
+    handle() {
+	console.log('Hello world!');
+    }
+}
+module.exports = FooCommand;
+```
 To execute the command just type `c foo` in the console.
 
 ##Describing arguments and options
+
+```bash    
+class MakeUserCommand {
+    constructor() {
+        this.command = "make:user";
+        this.description = "My awesome description!";
+        
+        this.arguments = [
+            {
+                key: 'name',
+                required: true,
+                description: 'User name',
+                default: 'John' //if default is set required is ignored 
+            },
+        ];
+        
+        this.options = [
+            {
+                key: '--lastname', 
+                short: '-l', 
+                default: 'Doe', //if default is set required is ignored 
+                required:false, 
+                description: 'Users last name',
+            }
+        ];
+    }   
     
-     class MakeUserCommand {
-         constructor() {
-             this.command = "make:user";
-             this.description = "My awesome description!";
-             
-             this.arguments = [
-                 {
-                     key: 'name',
-                     required: true,
-                     description: 'User name',
-                     default: 'John' //if default is set required is ignored 
-                 },
-             ];
-             
-             this.options = [
-                 {
-                     key: '--lastname', 
-                     short: '-l', 
-                     default: 'Doe', //if default is set required is ignored 
-                     required:false, 
-                     description: 'Users last name',
-                 }
-             ];
-         }   
-         
-         handle() {
-             
-             // all input is held in this.input
-             
-             console.log(this.input.name);
-             console.log(this.input.lastname);
-             
-         }
-     }
-     module.exports = MakeUserCommand;
-    
-    
+    handle() {
+        
+        // all input is held in this.input
+        
+        console.log(this.input.name);
+        console.log(this.input.lastname);
+        
+    }
+}
+module.exports = MakeUserCommand;
+```
+
 ##Passing options to command
 
 The above command accepts one `lastname` option. There are multiple ways of passing it:
     
-     $ c make:user John --lastname Doe 
-     $ c make:user John --lastname=Doe 
-     $ c make:user John --lastname="Doe Doee" 
-     $ c make:user John -l Doe 
-     $ c make:user John -l=Doe 
-     $ c make:user John -l="Doe Doee" 
+```bash
+$ c make:user John --lastname Doe 
+$ c make:user John --lastname=Doe 
+$ c make:user John --lastname="Doe Doee" 
+$ c make:user John -l Doe 
+$ c make:user John -l=Doe 
+$ c make:user John -l="Doe Doee" 
+```    
     
 It does not matter witch option you use, all of them will store the value into this.input.lastname variable
 
@@ -94,5 +98,6 @@ the current directory. To remove commands that no longer exist use `c cache:clea
 
 
 ##Tests
-
-    npm test
+```bash
+$ npm test
+```
