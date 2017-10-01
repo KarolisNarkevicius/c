@@ -152,7 +152,7 @@ class cli {
             }
 
             //extract an option from options string OPTION_ANY CONSTANT
-            let expression = '(\\s(' + key + '(=|\\s)(\\w+|(\'[A-Za-z0-9_ ]+\')|("[A-Za-z0-9_ ]+"))))|(\\s' + key + '(\\s|$))';
+            let expression = '(\\s?(' + key + '(=|\\s)(\\w+|(\'[A-Za-z0-9_ ]+\')|("[A-Za-z0-9_ ]+"))))|(\\s' + key + '(\\s|$))';
             let re = new RegExp(expression);
             let matches = optionsString.match(re);
             if (matches) {
@@ -181,20 +181,21 @@ class cli {
             return;
         }
 
-        let key = commandOption.key;
+        let key = "(" + commandOption.key;
         if (commandOption.short) {
             key += '|' + commandOption.short;
         }
+        key += ")";
 
         let matches = match.match(new RegExp(key + '\\s"(.+)"'));
         if (matches && matches[1]) {
-            this.commandInstance.input[newKey] = matches[1];
+            this.commandInstance.input[newKey] = matches[2];
             return;
         }
 
         matches = match.match(new RegExp(key + '\\s(.+)'));
         if (matches && matches[1]) {
-            this.commandInstance.input[newKey] = matches[1];
+            this.commandInstance.input[newKey] = matches[2];
             return;
         }
 

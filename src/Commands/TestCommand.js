@@ -1,43 +1,48 @@
 class TestCommand {
-	
-	constructor() {
 
-		this.command = 'test';
-		this.description = 'test command for testing creating `c` functionality';
+    constructor() {
 
-		this.arguments = [
-			{
-				key: 'name',
-				default: 'Joe', //if deafault is set required is ignored
-				description: 'User name',
-			},
-			'kitas',
-		];
+        this.command = 'test';
+        this.description = 'test command for testing creating `c` functionality';
 
-		this.options = [
-			{
-				key: '--last',
-				short: '-l',
-				default: '1.0.0',
-				required:false,
-				description: 'Prints last name',
-			}, 
-			{
-				key: '--model',
-                short: '-m',
-                default: 'Users',
-                required:true,
-                description: 'Sets user model'
-			}
-		];
+        this.arguments = [
+            'name',
+            'lastname'
+        ];
 
-	}
+        this.options = [
+            {
+                key: '--fullname',
+                short: '-f',
+            },
+            {
+                key: '--name',
+                short: '-n',
+            },
+        ];
 
-	handle() {
+    }
 
-	    console.log(this.input);
+    handle() {
 
-	}
+        if (this.input.fullname && this.input.name && this.input.lastname) {
+            console.log(this.input.name + ' ' + this.input.lastname);
+            return;
+        }
+
+        if (this.input.lastname) {
+            console.log(this.input.lastname);
+            return;
+        }
+
+        if (this.input.name) {
+            console.log(this.input.name);
+            return;
+        }
+
+        console.log('test');
+
+    }
 
 }
 
