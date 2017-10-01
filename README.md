@@ -15,7 +15,8 @@ $ npm install -g c-global
 $ c make:command foo
 ```
 This will create a new file `FooCommand` in current directory.
-```bash
+
+```js
 class FooCommand {
     constructor() {
         this.command = "foo";
@@ -30,9 +31,9 @@ module.exports = FooCommand;
 ```
 To execute the command just type `c foo` in the console.
 
-##Describing arguments and options
+## Describing arguments and options
 
-```bash    
+```js  
 class MakeUserCommand {
     constructor() {
         this.command = "make:user";
@@ -70,7 +71,7 @@ class MakeUserCommand {
 module.exports = MakeUserCommand;
 ```
 
-##Passing options to command
+## Passing options to command
 
 The above command accepts one `lastname` option. There are multiple ways of passing it:
     
@@ -85,19 +86,19 @@ $ c make:user John -l="Doe Doee"
     
 It does not matter witch option you use, all of them will store the value into this.input.lastname variable
 
-##List
+## List
 To display the list of available commands just type `c` with no parameters. 
 All commands are 'namespaced', when creating a command like `make:user` make will be
 the namespace. It has no real purpose except for looking nice in list of commands.
 
-##Cache
+## Cache
 
 Using `c make:command <name>` command will create and automatically put the command to cache,
 To cache the commands your self you can use `c cache:dir` comamand, it will cache all commands in 
 the current directory. To remove commands that no longer exist use `c cache:clear` command.
 
 
-##Tests
+## Tests
 ```bash
 $ npm test
 ```
